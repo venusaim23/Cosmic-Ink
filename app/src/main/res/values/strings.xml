@@ -1,4 +1,19 @@
 <resources>
     <string name="app_name">Cosmic Ink</string>
     <string name="thumbnail">Thumbnail</string>
+    <string name="welcome">Welcome</string>
+    <string name="select_purpose">Select your purpose from below</string>
+    <string name="court_session">Court Session</string>
+    <string name="therapy">Therapy</string>
+    <string name="lecture">Lecture</string>
+    <string name="custom">Custom</string>
+    <string name="select_url">Select an option and enter the URL</string>
+    <string name="url">URL</string>
+    <string name="analyse_video">Analyse Video</string>
+    <string name="analyse_audio">Analyse Audio</string>
+    <string name="join_a_meeting">Join a meeting</string>
+    <string name="go">Go</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="dtmf">DTMF code</string>
+    <string name="email_address">Email Address</string>
 </resources>
