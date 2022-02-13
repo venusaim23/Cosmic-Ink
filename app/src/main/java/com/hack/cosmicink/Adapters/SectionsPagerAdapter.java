@@ -21,24 +21,26 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2,
             R.string.tab_text_3, R.string.tab_text_4, R.string.tab_text_5};
     private final Context mContext;
+    private String convoId;
 
-    public SectionsPagerAdapter(Context context, FragmentManager fm) {
+    public SectionsPagerAdapter(Context context, FragmentManager fm, String convoId) {
         super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         mContext = context;
+        this.convoId = convoId;
     }
 
     @Override
     public Fragment getItem(int position) {
         if (position == 0)
-            return new MessagesFragment();
+            return new MessagesFragment(convoId);
         if (position == 1)
-            return new TopicsFragment();
+            return new TopicsFragment(convoId);
         if (position == 2)
-            return new QuestionsFragment();
+            return new QuestionsFragment(convoId);
         if (position == 3)
-            return new ActionsFragment();
+            return new ActionsFragment(convoId);
         if (position == 4)
-            return new FollowFragment();
+            return new FollowFragment(convoId);
         return null;
     }
 

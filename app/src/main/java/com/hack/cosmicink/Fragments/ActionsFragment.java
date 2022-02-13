@@ -1,7 +1,9 @@
 package com.hack.cosmicink.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -12,8 +14,17 @@ import com.hack.cosmicink.R;
 
 public class ActionsFragment extends Fragment {
 
-    public ActionsFragment() {
-        // Required empty public constructor
+    private String conversationId;
+    private Context context;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
+    public ActionsFragment(String conversationId) {
+        this.conversationId = conversationId;
     }
 
     @Override
