@@ -16,4 +16,13 @@
     <string name="phone_number">Phone Number</string>
     <string name="dtmf">DTMF code</string>
     <string name="email_address">Email Address</string>
+    <string name="or">OR</string>
+    <string name="enter_conversation_id">Enter conversation ID</string>
+    <string name="connect">Connect</string>
+    <string name="title_activity_details">DetailsActivity</string>
+    <string name="tab_text_1">Messages</string>
+    <string name="tab_text_2">Topics</string>
+    <string name="tab_text_3">Questions</string>
+    <string name="tab_text_4">Actions</string>
+    <string name="tab_text_5">Follow-Ups</string>
 </resources>
