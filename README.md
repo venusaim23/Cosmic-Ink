@@ -3,6 +3,13 @@
 Cosmic Ink is a transcript application which was built with the help of Symbl AI and At Sign platform for back-end to store our data and authenticate. It process vast sum of conversations and summarizes them based on the following categories: Topics discussed, Messages Sent, Questions asked, Actions performed, Follow-ups. It also contains Analyser that presents total silence time, total talk time, total overlaps, and so on, which helps track effectiveness of the conversation.
 It saves time of the user rather going the conventional way and provides a window for their quality time.
 
+## Main Features
+### Analyse Audio/Video
+Upload the URL of the required audio/video in the provided space and press the button, GO! Now, Symbl AI will provide u all the insights of the conversations.
+
+### Join a meeting
+As for joining a meeting, provide a valid Phone number, DTMF code and email address that receives the transcripts and press the button, GO! Now, Symbl AI wil provide the live transcripts and other insights of the meeting.
+
 ## How to fork?
 ### Step 1: Fork the repository
 Forking the repository will create a copy of the repository in your gitHub where you can add custom features and build a different version of the app for yourself. You can also, contribute to the template by suggesting necessary changes through issues.
