@@ -33,7 +33,7 @@ public class LoadingActivity extends AppCompatActivity {
     private ActivityLoadingBinding binding;
 
     private String URL = "";
-    private int[] backgrounds = {R.drawable.doctor, R.drawable.teacher, R.drawable.law, R.drawable.custom};
+    private int[] backgrounds = {R.drawable.bg_0, R.drawable.bg_1, R.drawable.bg_3, R.drawable.bg_4};
 
     private String conversationId;
     private String jobId;

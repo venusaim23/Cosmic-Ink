@@ -58,19 +58,31 @@
             android:id="@+id/video_radio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/analyse_video" />
+            android:fontFamily="@font/gideon_regular"
+            android:text="@string/analyse_video"
+            android:textColor="@color/text_grey"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <RadioButton
             android:id="@+id/audio_radio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/analyse_audio" />
+            android:fontFamily="@font/gideon_regular"
+            android:text="@string/analyse_audio"
+            android:textColor="@color/text_grey"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <RadioButton
             android:id="@+id/meet_radio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/join_a_meeting" />
+            android:fontFamily="@font/gideon_regular"
+            android:text="@string/join_a_meeting"
+            android:textColor="@color/text_grey"
+            android:textSize="16sp"
+            android:textStyle="bold" />
     </RadioGroup>
 
     <Button
@@ -102,8 +114,8 @@
         android:id="@+id/convo_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/enter_conversation_id"
         android:layout_marginTop="5dp"
+        android:text="@string/enter_conversation_id"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -115,7 +127,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
