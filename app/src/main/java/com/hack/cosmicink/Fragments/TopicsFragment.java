@@ -97,17 +97,17 @@ public class TopicsFragment extends Fragment {
 
     private void retrieveMessages(JSONObject response) {
         try {
-            JSONArray messageArray = response.getJSONArray("messages");
+            JSONArray messageArray = response.getJSONArray("topics");
 
             for (int i = 0; i < messageArray.length(); i++) {
                 JSONObject message = messageArray.getJSONObject(i);
                 String id = message.getString("id");
                 String text = message.getString("text");
-                String startTime = message.getString("startTime");
-                String endTime = message.getString("endTime");
-                String convoID = message.getString("conversationId");
+//                String startTime = message.getString("startTime");
+//                String endTime = message.getString("endTime");
+//                String convoID = message.getString("conversationId");
 
-                Message m = new Message(id, text, startTime, endTime, convoID);
+                Message m = new Message(id, text);
                 messages.add(m);
                 adapter.notifyDataSetChanged();
             }

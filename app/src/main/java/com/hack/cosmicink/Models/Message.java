@@ -10,6 +10,11 @@ public class Message {
     public Message() {
     }
 
+    public Message(String id, String text) {
+        this.id = id;
+        this.text = text;
+    }
+
     public Message(String id, String text, String conversationId) {
         this.id = id;
         this.text = text;
