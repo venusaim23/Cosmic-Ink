@@ -1,16 +1,20 @@
 package com.hack.cosmicink.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.hack.cosmicink.R;
 import com.hack.cosmicink.Utilities.Credentials;
 import com.hack.cosmicink.databinding.ActivityMainBinding;
 
@@ -39,9 +43,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void navigateNext(int card) {
-        Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
-        intent.putExtra("Card", card);
-        startActivity(intent);
+        if (Credentials.accessToken == null || Credentials.accessToken.isEmpty())
+            Toast.makeText(this, "Access Token did not generate!", Toast.LENGTH_LONG).show();
+        else {
+            Intent intent = new Intent(MainActivity.this, LoadingActivity.class);
+            intent.putExtra("Card", card);
+            startActivity(intent);
+        }
     }
 
     private void generateAccessToken() {
@@ -65,11 +73,27 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }, error -> {
-                    Toast.makeText(MainActivity.this, "Could not retrieve access token. Error: "
-                            + error.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "Could not retrieve access token. Error: " + error.getMessage());
-                });
+            Toast.makeText(MainActivity.this, "Could not retrieve access token. Error: "
+                    + error.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Could not retrieve access token. Error: " + error.getMessage());
+        });
 
         queue.add(request);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.all_convo_menu) {
+            //open conversations
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

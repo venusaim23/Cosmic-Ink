@@ -1,13 +1,14 @@
 package com.hack.cosmicink.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -32,8 +33,7 @@ public class LoadingActivity extends AppCompatActivity {
     private static final String TAG = "Loading Log";
     private ActivityLoadingBinding binding;
 
-    private String URL = "";
-    private int[] backgrounds = {R.drawable.bg_0, R.drawable.bg_1, R.drawable.bg_3, R.drawable.bg_4};
+    private final int[] backgrounds = {R.drawable.bg_0, R.drawable.bg_1, R.drawable.bg_3, R.drawable.bg_4};
 
     private String conversationId;
     private String jobId;
@@ -44,6 +44,9 @@ public class LoadingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityLoadingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
         int card = intent.getIntExtra("Card", 0);
@@ -60,48 +63,39 @@ public class LoadingActivity extends AppCompatActivity {
                 binding.urlInputLayout.setVisibility(View.VISIBLE);
         });
 
-        binding.goBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (binding.radioGroup.getCheckedRadioButtonId() == R.id.video_radio)
-                    uploadVideo();
-                else if (binding.radioGroup.getCheckedRadioButtonId() == R.id.audio_radio)
-                    uploadAudio();
-                else if (binding.radioGroup.getCheckedRadioButtonId() == R.id.meet_radio)
-                    openDialog();
-            }
+        binding.goBtn.setOnClickListener(v -> {
+            if (binding.radioGroup.getCheckedRadioButtonId() == R.id.video_radio)
+                uploadVideo();
+            else if (binding.radioGroup.getCheckedRadioButtonId() == R.id.audio_radio)
+                uploadAudio();
+            else if (binding.radioGroup.getCheckedRadioButtonId() == R.id.meet_radio)
+                openDialog();
         });
 
-        binding.convoBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(LoadingActivity.this);
+        binding.convoBtn.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(LoadingActivity.this);
 
-                View view = getLayoutInflater().inflate(R.layout.simple_dialog_layout, null);
-                builder.setTitle(getResources().getString(R.string.enter_conversation_id))
-                        .setView(view).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                        .setCancelable(true);
+            View view = getLayoutInflater().inflate(R.layout.simple_dialog_layout, null);
+            builder.setTitle(getResources().getString(R.string.enter_conversation_id))
+                    .setView(view).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                    .setCancelable(true);
 
-                AlertDialog dialog = builder.create();
-                dialog.show();
+            AlertDialog dialog = builder.create();
+            dialog.show();
 
-                TextInputEditText et = view.findViewById(R.id.edittext);
-                Button go = view.findViewById(R.id.dialog_btn);
-                go.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        conversationId = et.getText().toString().trim();
-                        getConversation();
-                    }
-                });
-            }
+            TextInputEditText et = view.findViewById(R.id.edittext);
+            Button go = view.findViewById(R.id.dialog_btn);
+            go.setOnClickListener(v1 -> {
+                conversationId = et.getText().toString().trim();
+                getConversation();
+            });
         });
     }
 
     private void uploadVideo() {
-        URL = binding.urlEt.getText().toString().trim();
+        String URL = binding.urlEt.getText().toString().trim();
         if (URL.isEmpty()) {
-            Toast.makeText(this, "Access token not received yet\nPlease wait", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "URL cannot be empty!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -110,7 +104,7 @@ public class LoadingActivity extends AppCompatActivity {
             param.put("url", URL);
             param.put("confidenceThreshold", 0.6);
             param.put("timezoneOffset", 0);
-            param.put("name", "BusinessMeeting");
+            param.put("name", "Video Session");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -136,8 +130,11 @@ public class LoadingActivity extends AppCompatActivity {
                             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
-                }, error -> Toast.makeText(LoadingActivity.this,
-                "Could not send video URL. Error: " + error.getMessage(), Toast.LENGTH_LONG).show()) {
+                }, error -> {
+                    Toast.makeText(LoadingActivity.this,
+                            "Could not send video URL. Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "Video POST Error: " + error.getMessage());
+                }) {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
@@ -155,7 +152,11 @@ public class LoadingActivity extends AppCompatActivity {
     }
 
     private void openDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
+        View v = getLayoutInflater().inflate(R.layout.phone_dialog_layout, null);
+        builder.setView(v).setCancelable(true).setTitle("Fill the meeting details")
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
     }
 
     private void getStatus() {
@@ -170,7 +171,7 @@ public class LoadingActivity extends AppCompatActivity {
                         if (status.equals("completed")) {
                             getConversation();
                         } else {
-                            new Handler().postDelayed(() -> getStatus(), 2000);
+                            new Handler().postDelayed(this::getStatus, 2000);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -192,5 +193,15 @@ public class LoadingActivity extends AppCompatActivity {
         Intent intent = new Intent(LoadingActivity.this, DetailsActivity.class);
         intent.putExtra("Conversation ID", conversationId);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
