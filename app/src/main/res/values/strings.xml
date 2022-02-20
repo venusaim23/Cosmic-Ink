@@ -26,4 +26,6 @@
     <string name="tab_text_4">Actions</string>
     <string name="tab_text_5">Follow-Ups</string>
     <string name="all_conversations">All Conversations</string>
+    <string name="conversation_details">Conversation Details</string>
+    <string name="conversation_analytics">Conversation Analytics</string>
 </resources>

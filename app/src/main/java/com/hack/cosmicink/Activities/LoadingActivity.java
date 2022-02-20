@@ -22,6 +22,7 @@ import com.hack.cosmicink.R;
 import com.hack.cosmicink.Utilities.Credentials;
 import com.hack.cosmicink.databinding.ActivityLoadingBinding;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,12 +65,22 @@ public class LoadingActivity extends AppCompatActivity {
         });
 
         binding.goBtn.setOnClickListener(v -> {
-            if (binding.radioGroup.getCheckedRadioButtonId() == R.id.video_radio)
-                uploadVideo();
-            else if (binding.radioGroup.getCheckedRadioButtonId() == R.id.audio_radio)
-                uploadAudio();
-            else if (binding.radioGroup.getCheckedRadioButtonId() == R.id.meet_radio)
+            String URL = binding.urlEt.getText().toString().trim();
+
+            if (binding.radioGroup.getCheckedRadioButtonId() == R.id.meet_radio)
                 openDialog();
+            else {
+                if (URL.isEmpty())
+                    Toast.makeText(this, "URL cannot be empty!", Toast.LENGTH_SHORT).show();
+                else {
+                    if (binding.radioGroup.getCheckedRadioButtonId() == R.id.video_radio)
+                        uploadVideo(URL);
+                    else if (binding.radioGroup.getCheckedRadioButtonId() == R.id.audio_radio)
+                        uploadAudio(URL);
+
+                    binding.progressBarLoad.setVisibility(View.VISIBLE);
+                }
+            }
         });
 
         binding.convoBtn.setOnClickListener(v -> {
@@ -92,13 +103,7 @@ public class LoadingActivity extends AppCompatActivity {
         });
     }
 
-    private void uploadVideo() {
-        String URL = binding.urlEt.getText().toString().trim();
-        if (URL.isEmpty()) {
-            Toast.makeText(this, "URL cannot be empty!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+    private void uploadVideo(String URL) {
         JSONObject param = new JSONObject();
         try {
             param.put("url", URL);
@@ -131,10 +136,11 @@ public class LoadingActivity extends AppCompatActivity {
                         }
                     }
                 }, error -> {
-                    Toast.makeText(LoadingActivity.this,
-                            "Could not send video URL. Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "Video POST Error: " + error.getMessage());
-                }) {
+            Toast.makeText(LoadingActivity.this,
+                    "Could not send video URL. Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Video POST Error: " + error.getMessage());
+            binding.progressBarLoad.setVisibility(View.GONE);
+        }) {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
@@ -147,16 +153,125 @@ public class LoadingActivity extends AppCompatActivity {
         queue.add(request);
     }
 
-    private void uploadAudio() {
+    private void uploadAudio(String URL) {
+        JSONObject param = new JSONObject();
+        try {
+            param.put("url", URL);
+            param.put("confidenceThreshold", 0.6);
+            param.put("timezoneOffset", 0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        queue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                "https://api.symbl.ai/v1/process/audio/url", param,
+                response -> {
+                    try {
+                        conversationId = response.getString("conversationId");
+                        jobId = response.getString("jobId");
+
+                        Log.d(TAG, "Conversation ID: " + conversationId);
+                        Log.d(TAG, "Job ID: " + jobId);
+
+                        getStatus();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }, error -> {
+            Toast.makeText(LoadingActivity.this,
+                    "Could not send audio URL. Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Audio POST Error: " + error.getMessage());
+            binding.progressBarLoad.setVisibility(View.GONE);
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + Credentials.accessToken);
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        queue.add(request);
     }
 
     private void openDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog diag;
 
         View v = getLayoutInflater().inflate(R.layout.phone_dialog_layout, null);
         builder.setView(v).setCancelable(true).setTitle("Fill the meeting details")
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        diag = builder.create();
+        diag.show();
+
+        TextInputEditText phoneET = v.findViewById(R.id.phone_et_dialog);
+        TextInputEditText dtmfET = v.findViewById(R.id.dtmf_et_dialog);
+        TextInputEditText emailET = v.findViewById(R.id.email_et_dialog);
+
+        v.findViewById(R.id.connect_btn_phone).setOnClickListener(v1 -> {
+            String phone = phoneET.getText().toString();
+            String dtmf = dtmfET.getText().toString();
+            String email = emailET.getText().toString();
+
+            startCall(phone, dtmf, email);
+
+            diag.dismiss();
+            binding.progressBarLoad.setVisibility(View.VISIBLE);
+        });
+    }
+
+    private void startCall(String phone, String dtmf, String email) {
+        JSONObject param = new JSONObject();
+        try {
+            param.put("operation", "start");
+
+            JSONObject endPoint = new JSONObject();
+            endPoint.put("type", "pstn");
+            endPoint.put("phoneNumber", phone);
+            endPoint.put("dtmf", dtmf);
+
+            param.put("endpoint", endPoint);
+
+            JSONArray actions = new JSONArray();
+            JSONObject action1 = new JSONObject();
+            action1.put("invokeOn", "stop");
+            action1.put("name", "sendSummaryEmail");
+            action1.put("parameters", new JSONObject().put("emails", new JSONArray().put(email)));
+            actions.put(action1);
+
+            param.put("actions", actions);
+            param.put("data", new JSONObject().put("session",
+                    new JSONObject().put("name", "Android Meeting")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        queue = Volley.newRequestQueue(this);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                "https://api.symbl.ai/v1/endpoint:connect", param,
+                response -> {
+                    //Todo get call details and stop loading
+
+                    binding.progressBarLoad.setVisibility(View.GONE);
+                }, error -> {
+            Toast.makeText(LoadingActivity.this,
+                    "Could not join meeting. Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Meeting POST Error: " + error.getMessage());
+            binding.progressBarLoad.setVisibility(View.GONE);
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + Credentials.accessToken);
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        queue.add(request);
     }
 
     private void getStatus() {
@@ -176,8 +291,13 @@ public class LoadingActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Toast.makeText(LoadingActivity.this,
-                "Could not get status. Error: " + error.getMessage(), Toast.LENGTH_LONG).show()) {
+
+                    binding.progressBarLoad.setVisibility(View.GONE);
+                }, error -> {
+            Toast.makeText(LoadingActivity.this,
+                    "Could not get status. Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            binding.progressBarLoad.setVisibility(View.GONE);
+        }) {
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();

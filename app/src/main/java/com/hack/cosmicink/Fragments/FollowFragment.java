@@ -20,7 +20,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.hack.cosmicink.Adapters.MessageAdapter;
 import com.hack.cosmicink.Models.Message;
-import com.hack.cosmicink.R;
 import com.hack.cosmicink.Utilities.Credentials;
 import com.hack.cosmicink.databinding.FragmentFollowBinding;
 
@@ -87,7 +86,7 @@ public class FollowFragment extends Fragment {
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
                 headers.put("Authorization", "Bearer " + Credentials.accessToken);
-//                headers.put("Content-Type", "application/json");
+                headers.put("Content-Type", "application/json");
                 return headers;
             }
         };

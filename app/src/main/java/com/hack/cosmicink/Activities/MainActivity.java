@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.all_convo_menu) {
-            //open conversations
+            //Todo open conversations
             return true;
         }
         return super.onOptionsItemSelected(item);
